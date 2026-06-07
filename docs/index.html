@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EcoWatch — ドローン環境モニタリング共創エリア探索</title>
+<meta name="description" content="国土交通省 Project LINKS『無人航空機飛行計画データ（2025年度）』をもとに、環境調査・自然観測を目的とするドローン飛行計画（申請ベース）の分布を可視化し、環境分野の共創候補エリアを探索するマップです。" />
+<link href="./vendor/maplibre/maplibre-gl.css" rel="stylesheet" />
+<link href="./css/style.css" rel="stylesheet" />
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">🛰️</span>
+      <div class="titles">
+        <h1>EcoWatch</h1>
+        <p class="subtitle">ドローン環境モニタリング共創エリア探索</p>
+      </div>
+    </div>
+    <div class="topbar-note">
+      環境調査・自然観測を目的とするドローン<strong>飛行計画（申請ベース）</strong>の分布
+    </div>
+    <button id="panel-toggle" class="panel-toggle" aria-label="パネル開閉">☰</button>
+  </header>
+
+  <div id="main">
+    <aside id="panel">
+      <div class="panel-scroll">
+
+        <section class="card notice">
+          <p>本マップは<strong>飛行計画（申請・報告）ベース</strong>であり、実際の飛行・実態を示すものではありません。元データは紙資料のスキャンから抽出されており、完全性・正確性は保証されません。</p>
+        </section>
+
+        <section class="card">
+          <h2>データ概要</h2>
+          <div id="summary" class="summary-grid">
+            <div class="metric"><span class="num" id="m-total">–</span><span class="lbl">環境用途の飛行計画</span></div>
+            <div class="metric"><span class="num" id="m-muni">–</span><span class="lbl">出発地 市区町村</span></div>
+            <div class="metric"><span class="num" id="m-months">–</span><span class="lbl">対象月</span></div>
+            <div class="metric"><span class="num" id="m-shown">–</span><span class="lbl">表示中</span></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>表示モード</h2>
+          <div class="seg" id="viewmode">
+            <label><input type="radio" name="viewmode" value="muni" checked /> 市区町村集計（出発地）</label>
+            <label><input type="radio" name="viewmode" value="heat" /> ヒートマップ</label>
+            <label><input type="radio" name="viewmode" value="area" /> 飛行範囲ポリゴン（今後追加）</label>
+          </div>
+          <p class="hint">飛行範囲ポリゴン（個票 約29万件）はベクトルタイル化を前提とし、今後追加予定です。出発地は行政区域の代表地点に秘匿化されているため、分布は市区町村粒度で表示します。</p>
+        </section>
+
+        <section class="card">
+          <h2>飛行目的でしぼり込み</h2>
+          <label class="chk"><input type="checkbox" id="f-env" checked /> <span class="dot env"></span>環境調査</label>
+          <label class="chk"><input type="checkbox" id="f-nat" checked /> <span class="dot nat"></span>自然観測</label>
+          <hr />
+          <label class="chk"><input type="checkbox" id="f-excl-comp" checked /> 包括申請（目的を多数選択）を除外</label>
+          <p class="hint">飛行目的フラグが極端に多い行は、用途を絞らない包括的な申請とみなして既定で除外します。</p>
+        </section>
+
+        <section class="card">
+          <h2>対象期間</h2>
+          <div class="month-range">
+            <label>開始 <select id="f-month-start"></select></label>
+            <label>終了 <select id="f-month-end"></select></label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>背景地図・レイヤ</h2>
+          <div class="seg" id="basemap">
+            <label><input type="radio" name="basemap" value="std" checked /> 地理院 標準</label>
+            <label><input type="radio" name="basemap" value="pale" /> 淡色</label>
+            <label><input type="radio" name="basemap" value="photo" /> 衛星写真</label>
+          </div>
+          <hr />
+          <label class="chk"><input type="checkbox" id="l-shinrin" /> <span class="swatch shinrin"></span>地形陰影（地理院 陰影起伏図）</label>
+          <p class="hint">自然公園・河川・森林域の詳細レイヤ（国土数値情報・環境省データ）との重ね合わせは今後追加予定です。</p>
+        </section>
+
+        <section class="card legend">
+          <h2>凡例</h2>
+          <div id="legend-body"></div>
+        </section>
+
+        <section class="card source">
+          <h2>出典・ライセンス</h2>
+          <p>出典：国土交通省 Project LINKS『無人航空機飛行計画データ（2025年度）』を加工して作成。</p>
+          <p>公共データ利用規約（第1.0版）／CC BY 4.0 互換。背景地図：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル（国土地理院）</a>。</p>
+          <p class="fineprint">元データは秘匿化済み（出発地は行政区域の代表地点）。本サイトは個人特定につながる二次加工を行いません。</p>
+          <p class="fineprint" id="gen-info"></p>
+        </section>
+
+      </div>
+    </aside>
+
+    <div id="map"></div>
+  </div>
+
+  <div id="popup-tpl" hidden></div>
+</div>
+
+<script src="./vendor/maplibre/maplibre-gl.js"></script>
+<script src="./js/app.js"></script>
+</body>
+</html>

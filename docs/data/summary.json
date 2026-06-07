@@ -1,0 +1,77 @@
+{
+ "generated": "2026-06-08 07:22 JST",
+ "months": [
+  "2024-07",
+  "2024-08",
+  "2024-09",
+  "2024-10",
+  "2024-11",
+  "2024-12",
+  "2025-01",
+  "2025-02",
+  "2025-03",
+  "2025-04",
+  "2025-05",
+  "2025-06"
+ ],
+ "scanned_total": 2971260,
+ "total": 387100,
+ "genuine_total": 292142,
+ "comprehensive_total": 94958,
+ "municipality_count": 1865,
+ "by_month": {
+  "2024-07": {
+   "genuine": 7,
+   "comprehensive": 2
+  },
+  "2024-08": {
+   "genuine": 20,
+   "comprehensive": 19
+  },
+  "2024-09": {
+   "genuine": 991,
+   "comprehensive": 461
+  },
+  "2024-10": {
+   "genuine": 1459,
+   "comprehensive": 426
+  },
+  "2024-11": {
+   "genuine": 20948,
+   "comprehensive": 10285
+  },
+  "2024-12": {
+   "genuine": 27186,
+   "comprehensive": 10803
+  },
+  "2025-01": {
+   "genuine": 30635,
+   "comprehensive": 10676
+  },
+  "2025-02": {
+   "genuine": 24407,
+   "comprehensive": 11309
+  },
+  "2025-03": {
+   "genuine": 67996,
+   "comprehensive": 11888
+  },
+  "2025-04": {
+   "genuine": 30306,
+   "comprehensive": 13902
+  },
+  "2025-05": {
+   "genuine": 65235,
+   "comprehensive": 11704
+  },
+  "2025-06": {
+   "genuine": 22952,
+   "comprehensive": 13483
+  }
+ },
+ "by_purpose": {
+  "環境調査": 249052,
+  "自然観測": 210240
+ },
+ "has_areas": false
+}

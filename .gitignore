@@ -1,0 +1,14 @@
+# 中間生成物・大容量データ（再生成可能なためコミットしない）
+# ルート直下の data/ のみ対象（site 用の docs/data/ は配信物としてコミットする）
+/data/
+*.geojson.tmp
+
+# OS / editor
+.DS_Store
+*.swp
+__pycache__/
+*.pyc
+
+# ローカル検証用
+/tmp/
+node_modules/
