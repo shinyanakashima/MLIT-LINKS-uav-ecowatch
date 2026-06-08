@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - claude/env-monitoring-area-exploration-p7n1w
     paths:
       - docs/**
       - .github/workflows/deploy-pages.yml
