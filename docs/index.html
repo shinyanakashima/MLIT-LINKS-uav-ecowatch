@@ -77,8 +77,9 @@
             <label><input type="radio" name="basemap" value="photo" /> 衛星写真</label>
           </div>
           <hr />
+          <label class="chk"><input type="checkbox" id="l-shizen" checked /> <span class="swatch shizen"></span>自然公園地域（国立・国定・都道府県立）</label>
           <label class="chk"><input type="checkbox" id="l-shinrin" /> <span class="swatch shinrin"></span>地形陰影（地理院 陰影起伏図）</label>
-          <p class="hint">自然公園・河川・森林域の詳細レイヤ（国土数値情報・環境省データ）との重ね合わせは今後追加予定です。</p>
+          <p class="hint">自然公園地域：国土数値情報「自然公園地域データ(A10)」。河川・森林域レイヤは今後追加予定です。</p>
         </section>
 
         <section class="card legend">
@@ -90,6 +91,7 @@
           <h2>出典・ライセンス</h2>
           <p>出典：国土交通省 Project LINKS『無人航空機飛行計画データ（2025年度）』を加工して作成。</p>
           <p>公共データ利用規約（第1.0版）／CC BY 4.0 互換。背景地図：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル（国土地理院）</a>。</p>
+          <p>自然公園地域：<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A10-v3_1.html" target="_blank" rel="noopener">国土数値情報「自然公園地域データ(A10)」（国土交通省）</a>を加工して作成。</p>
           <p class="fineprint">元データは秘匿化済み（出発地は行政区域の代表地点）。本サイトは個人特定につながる二次加工を行いません。</p>
           <p class="fineprint" id="gen-info"></p>
         </section>

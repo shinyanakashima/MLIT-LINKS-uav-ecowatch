@@ -30,6 +30,7 @@ const state = {
   view: 'muni',     // muni | heat
   basemap: 'std',
   muni: null,
+  shizen: null,     // 自然公園地域 GeoJSON
 };
 
 let map;
@@ -99,6 +100,19 @@ function buildMuniGeojson() {
   document.getElementById('m-shown').textContent = fmt(shown);
   document.getElementById('m-muni').textContent = fmt(placesShown);
   return { type: 'FeatureCollection', features };
+}
+
+// ---- natural environment layer (自然公園地域 / 国土数値情報 A10) ----
+function addNatureLayer() {
+  map.addSource('shizen', { type: 'geojson', data: state.shizen });
+  map.addLayer({
+    id: 'shizen-fill', type: 'fill', source: 'shizen',
+    paint: { 'fill-color': '#2ea05a', 'fill-opacity': 0.22 },
+  });
+  map.addLayer({
+    id: 'shizen-line', type: 'line', source: 'shizen',
+    paint: { 'line-color': '#1f7d44', 'line-width': 0.8, 'line-opacity': 0.55 },
+  });
 }
 
 // ---- layers ----
@@ -229,13 +243,21 @@ function wireControls() {
   document.getElementById('f-nat').onchange = (e) => { state.nat = e.target.checked; refilter(); };
   document.getElementById('f-excl-comp').onchange = (e) => { state.exclComp = e.target.checked; refilter(); };
   document.getElementById('l-shinrin').onchange = (e) => setVis('shinrin', e.target.checked);
+  const shz = document.getElementById('l-shizen');
+  if (shz) shz.onchange = (e) => { setVis('shizen-fill', e.target.checked); setVis('shizen-line', e.target.checked); };
   document.getElementById('panel-toggle').onclick = () => document.getElementById('panel').classList.toggle('open');
 }
 
 async function init() {
   const summary = await fetch('./data/summary.json').then((r) => r.json());
   state.muni = await fetch('./data/municipalities.json').then((r) => r.json());
+  try {
+    state.shizen = await fetch('./data/shizen_koen.geojson').then((r) => { if (!r.ok) throw 0; return r.json(); });
+  } catch (e) { state.shizen = null; }
   state.months = summary.months;
+
+  const shizenChk = document.getElementById('l-shizen');
+  if (!state.shizen && shizenChk) { shizenChk.checked = false; shizenChk.disabled = true; const l = shizenChk.closest('label'); if (l) l.style.opacity = 0.45; }
 
   // 飛行範囲ポリゴン（個票）はベクトルタイル化を要するため当面無効
   if (!summary.has_areas) {
@@ -258,6 +280,7 @@ async function init() {
     zoom: 4.3,
     minZoom: 3,
     maxZoom: 17,
+    hash: 'loc',
     attributionControl: false,
   });
   map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
@@ -265,6 +288,7 @@ async function init() {
   map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
   map.on('load', () => {
+    if (state.shizen) addNatureLayer();
     addDataLayers();
     setupInteractions();
     applyView();

@@ -11,9 +11,11 @@
 
 - **市区町村集計マップ**：出発地ごとの環境用途飛行計画件数を、比例円（大きさ・色）で表示。
 - **ヒートマップ**：環境用途飛行の密度を全国スケールで俯瞰。
+- **自然環境レイヤの重ね合わせ**：自然公園地域（国立・国定・都道府県立／国土数値情報 A10）を
+  オーバーレイし、環境用途飛行と保護自然域との空間的な重なりを把握。
 - **フィルタ**：飛行目的（環境調査／自然観測）、対象期間（月次レンジ）、包括申請の除外。
 - **背景地図**：地理院タイル（標準／淡色／衛星写真）。地形陰影の重ね合わせ。
-- **凡例・出典・データ品質に関する注記**を常時表示。
+- **凡例・出典・データ品質に関する注記**を常時表示。共有用にURLハッシュへ地図位置を保存。
 
 ## データの取り扱いと注記
 
@@ -36,6 +38,7 @@
 > 出典：国土交通省 Project LINKS『無人航空機飛行計画データ（2025年度）』を加工して作成
 
 背景地図は[地理院タイル（国土地理院）](https://maps.gsi.go.jp/development/ichiran.html)を利用しています。
+自然公園地域は[国土数値情報「自然公園地域データ(A10)」（国土交通省）](https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A10-v3_1.html)を加工して作成しています。
 
 ## ディレクトリ構成
 
@@ -47,16 +50,18 @@ docs/                 GitHub Pages で配信する静的サイト（公開ルー
   data/
     summary.json        サマリ（総件数・月別・目的別など）
     municipalities.json 出発地（市区町村）別の月×カテゴリ集計
+    shizen_koen.geojson 自然公園地域（A10を簡略化・結合した軽量ポリゴン）
   vendor/             MapLibre GL JS / グリフ（CDN 非依存で自己完結）
 scripts/
   extract_env_flights.py  月次GeoJSON（約10GB）をストリーム処理し環境用途を抽出
   build_site_data.py      抽出結果から配信用の軽量JSONを生成
+  build_nature_layer.py   国土数値情報A10から自然公園地域の軽量GeoJSONを生成
 ```
 
 ## データの再生成手順
 
 ```bash
-pip install ijson openpyxl
+pip install ijson openpyxl pyshp shapely
 
 # 1) 全12ヶ月（16ファイル・約10GB）をダウンロード→ストリーム抽出（逐次削除）
 #    出力: data/env_flights.json（環境用途 約39万件）
@@ -64,6 +69,9 @@ python3 scripts/extract_env_flights.py data
 
 # 2) 配信用の軽量データを生成（docs/data/ に出力）
 python3 scripts/build_site_data.py data/env_flights.json docs/data
+
+# 3) 自然公園地域レイヤを生成（47都道府県のA10を結合・簡略化、docs/data/ に出力）
+python3 scripts/build_nature_layer.py docs/data
 ```
 
 `data/` は中間生成物のためコミットしません（`.gitignore`）。配信に必要な `docs/data/*.json` のみをコミットします。
@@ -89,8 +97,12 @@ API キー不要・静的タイルのみで動作し、Pages 単独で完結し�
 
 ## 今後の拡張（要確認）
 
-- **自然環境レイヤとの重ね合わせ**：国土数値情報（河川・森林地域・自然公園）、環境省データを
-  トグルレイヤとして追加し、環境用途飛行と自然環境域との空間的な重なりを可視化。
+- **自然環境レイヤの拡充**：河川（国土数値情報 W05）・森林地域（A13）・環境省データを
+  トグルレイヤとして追加し、環境用途飛行との重なりをさらに精緻化。
 - **飛行範囲ポリゴン**：個票の `geometry`（約29万件）はベクトルタイル（PMTiles 等）化して
   ズーム連動で表示。
-- 空間結合をオンデマンドで行う場合は Cloudflare（Workers/R2）構成を検討。
+- **地域フィルタ**：都道府県・地域での絞り込み UI（例：北海道／十勝管内）。
+- 空間結合（飛行範囲×自然環境域の重なり面積算出）をオンデマンドで行う場合は
+  Cloudflare（Workers/R2）構成を検討。
+
+※ 自然公園地域（A10）の重ね合わせは実装済み。

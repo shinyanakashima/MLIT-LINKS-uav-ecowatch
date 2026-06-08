@@ -84,8 +84,8 @@ select {
 .dot.env { background: var(--env); }
 .dot.nat { background: var(--nat); }
 .swatch { width: 14px; height: 11px; border-radius: 3px; display: inline-block; border: 1px solid rgba(255,255,255,.2); }
-.swatch.shinrin { background: #3f6f3a; }
-.swatch.lake { background: #3a6f9e; }
+.swatch.shinrin { background: #6b6b6b; }
+.swatch.shizen { background: rgba(46,160,90,.55); border-color: #2ea05a; }
 
 /* Legend */
 .legend .row { display: flex; align-items: center; gap: 8px; font-size: 12px; margin: 5px 0; color: var(--muted); }
