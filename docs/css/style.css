@@ -40,6 +40,12 @@ body {
   display: none; background: var(--card); color: var(--txt);
   border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; font-size: 16px;
 }
+.lang-toggle {
+  background: var(--card); color: var(--txt); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; min-width: 54px;
+  margin-left: auto;
+}
+.lang-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
 /* Layout */
 #main { flex: 1; display: flex; min-height: 0; }

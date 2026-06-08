@@ -15,13 +15,14 @@
       <span class="logo" aria-hidden="true">🛰️</span>
       <div class="titles">
         <h1>EcoWatch</h1>
-        <p class="subtitle">ドローン環境モニタリング共創エリア探索</p>
+        <p class="subtitle" data-i18n="subtitle">ドローン環境モニタリング共創エリア探索</p>
       </div>
     </div>
-    <div class="topbar-note">
+    <div class="topbar-note" data-i18n-html="topbar_note">
       環境調査・自然観測を目的とするドローン<strong>飛行計画（申請ベース）</strong>の分布
     </div>
-    <button id="panel-toggle" class="panel-toggle" aria-label="パネル開閉">☰</button>
+    <button id="lang-toggle" class="lang-toggle" aria-label="Language">EN</button>
+    <button id="panel-toggle" class="panel-toggle" data-i18n-aria="panel_toggle" aria-label="パネル開閉">☰</button>
   </header>
 
   <div id="main">
@@ -29,70 +30,70 @@
       <div class="panel-scroll">
 
         <section class="card notice">
-          <p>本マップは<strong>飛行計画（申請・報告）ベース</strong>であり、実際の飛行・実態を示すものではありません。元データは紙資料のスキャンから抽出されており、完全性・正確性は保証されません。</p>
+          <p data-i18n-html="notice">本マップは<strong>飛行計画（申請・報告）ベース</strong>であり、実際の飛行・実態を示すものではありません。元データは紙資料のスキャンから抽出されており、完全性・正確性は保証されません。</p>
         </section>
 
         <section class="card">
-          <h2>データ概要</h2>
+          <h2 data-i18n="h_summary">データ概要</h2>
           <div id="summary" class="summary-grid">
-            <div class="metric"><span class="num" id="m-total">–</span><span class="lbl">環境用途の飛行計画</span></div>
-            <div class="metric"><span class="num" id="m-muni">–</span><span class="lbl">出発地 市区町村</span></div>
-            <div class="metric"><span class="num" id="m-months">–</span><span class="lbl">対象月</span></div>
-            <div class="metric"><span class="num" id="m-shown">–</span><span class="lbl">表示中</span></div>
+            <div class="metric"><span class="num" id="m-total">–</span><span class="lbl" data-i18n="m_total">環境用途の飛行計画</span></div>
+            <div class="metric"><span class="num" id="m-muni">–</span><span class="lbl" data-i18n="m_muni">出発地 市区町村</span></div>
+            <div class="metric"><span class="num" id="m-months">–</span><span class="lbl" data-i18n="m_months">対象月</span></div>
+            <div class="metric"><span class="num" id="m-shown">–</span><span class="lbl" data-i18n="m_shown">表示中</span></div>
           </div>
         </section>
 
         <section class="card">
-          <h2>表示モード</h2>
+          <h2 data-i18n="h_viewmode">表示モード</h2>
           <div class="seg" id="viewmode">
-            <label><input type="radio" name="viewmode" value="muni" checked /> 市区町村集計（出発地）</label>
-            <label><input type="radio" name="viewmode" value="heat" /> ヒートマップ</label>
-            <label><input type="radio" name="viewmode" value="area" /> 飛行範囲ポリゴン（今後追加）</label>
+            <label><input type="radio" name="viewmode" value="muni" checked /> <span data-i18n="vm_muni">市区町村集計（出発地）</span></label>
+            <label><input type="radio" name="viewmode" value="heat" /> <span data-i18n="vm_heat">ヒートマップ</span></label>
+            <label><input type="radio" name="viewmode" value="area" /> <span data-i18n="vm_area">飛行範囲ポリゴン（今後追加）</span></label>
           </div>
-          <p class="hint">飛行範囲ポリゴン（個票 約29万件）はベクトルタイル化を前提とし、今後追加予定です。出発地は行政区域の代表地点に秘匿化されているため、分布は市区町村粒度で表示します。</p>
+          <p class="hint" data-i18n="viewmode_hint">飛行範囲ポリゴン（個票 約29万件）はベクトルタイル化を前提とし、今後追加予定です。出発地は行政区域の代表地点に秘匿化されているため、分布は市区町村粒度で表示します。</p>
         </section>
 
         <section class="card">
-          <h2>飛行目的でしぼり込み</h2>
-          <label class="chk"><input type="checkbox" id="f-env" checked /> <span class="dot env"></span>環境調査</label>
-          <label class="chk"><input type="checkbox" id="f-nat" checked /> <span class="dot nat"></span>自然観測</label>
+          <h2 data-i18n="h_purpose">飛行目的でしぼり込み</h2>
+          <label class="chk"><input type="checkbox" id="f-env" checked /> <span class="dot env"></span><span data-i18n="env">環境調査</span></label>
+          <label class="chk"><input type="checkbox" id="f-nat" checked /> <span class="dot nat"></span><span data-i18n="nat">自然観測</span></label>
           <hr />
-          <label class="chk"><input type="checkbox" id="f-excl-comp" checked /> 包括申請（目的を多数選択）を除外</label>
-          <p class="hint">飛行目的フラグが極端に多い行は、用途を絞らない包括的な申請とみなして既定で除外します。</p>
+          <label class="chk"><input type="checkbox" id="f-excl-comp" checked /> <span data-i18n="excl_comp">包括申請（目的を多数選択）を除外</span></label>
+          <p class="hint" data-i18n="purpose_hint">飛行目的フラグが極端に多い行は、用途を絞らない包括的な申請とみなして既定で除外します。</p>
         </section>
 
         <section class="card">
-          <h2>対象期間</h2>
+          <h2 data-i18n="h_period">対象期間</h2>
           <div class="month-range">
-            <label>開始 <select id="f-month-start"></select></label>
-            <label>終了 <select id="f-month-end"></select></label>
+            <label><span data-i18n="period_start">開始</span> <select id="f-month-start"></select></label>
+            <label><span data-i18n="period_end">終了</span> <select id="f-month-end"></select></label>
           </div>
         </section>
 
         <section class="card">
-          <h2>背景地図・レイヤ</h2>
+          <h2 data-i18n="h_layers">背景地図・レイヤ</h2>
           <div class="seg" id="basemap">
-            <label><input type="radio" name="basemap" value="std" checked /> 地理院 標準</label>
-            <label><input type="radio" name="basemap" value="pale" /> 淡色</label>
-            <label><input type="radio" name="basemap" value="photo" /> 衛星写真</label>
+            <label><input type="radio" name="basemap" value="std" checked /> <span data-i18n="bm_std">地理院 標準</span></label>
+            <label><input type="radio" name="basemap" value="pale" /> <span data-i18n="bm_pale">淡色</span></label>
+            <label><input type="radio" name="basemap" value="photo" /> <span data-i18n="bm_photo">衛星写真</span></label>
           </div>
           <hr />
-          <label class="chk"><input type="checkbox" id="l-shizen" checked /> <span class="swatch shizen"></span>自然公園地域（国立・国定・都道府県立）</label>
-          <label class="chk"><input type="checkbox" id="l-shinrin" /> <span class="swatch shinrin"></span>地形陰影（地理院 陰影起伏図）</label>
-          <p class="hint">自然公園地域：国土数値情報「自然公園地域データ(A10)」。河川・森林域レイヤは今後追加予定です。</p>
+          <label class="chk"><input type="checkbox" id="l-shizen" checked /> <span class="swatch shizen"></span><span data-i18n="l_shizen">自然公園地域（国立・国定・都道府県立）</span></label>
+          <label class="chk"><input type="checkbox" id="l-shinrin" /> <span class="swatch shinrin"></span><span data-i18n="l_shinrin">地形陰影（地理院 陰影起伏図）</span></label>
+          <p class="hint" data-i18n="layers_hint">自然公園地域：国土数値情報「自然公園地域データ(A10)」。河川・森林域レイヤは今後追加予定です。</p>
         </section>
 
         <section class="card legend">
-          <h2>凡例</h2>
+          <h2 data-i18n="h_legend">凡例</h2>
           <div id="legend-body"></div>
         </section>
 
         <section class="card source">
-          <h2>出典・ライセンス</h2>
-          <p>出典：国土交通省 Project LINKS『無人航空機飛行計画データ（2025年度）』を加工して作成。</p>
-          <p>公共データ利用規約（第1.0版）／CC BY 4.0 互換。背景地図：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル（国土地理院）</a>。</p>
-          <p>自然公園地域：<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A10-v3_1.html" target="_blank" rel="noopener">国土数値情報「自然公園地域データ(A10)」（国土交通省）</a>を加工して作成。</p>
-          <p class="fineprint">元データは秘匿化済み（出発地は行政区域の代表地点）。本サイトは個人特定につながる二次加工を行いません。</p>
+          <h2 data-i18n="h_source">出典・ライセンス</h2>
+          <p data-i18n="source1">出典：国土交通省 Project LINKS『無人航空機飛行計画データ（2025年度）』を加工して作成。</p>
+          <p data-i18n-html="source2">公共データ利用規約（第1.0版）／CC BY 4.0 互換。背景地図：<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル（国土地理院）</a>。</p>
+          <p data-i18n-html="source3">自然公園地域：<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-A10-v3_1.html" target="_blank" rel="noopener">国土数値情報「自然公園地域データ(A10)」（国土交通省）</a>を加工して作成。</p>
+          <p class="fineprint" data-i18n="source_fine">元データは秘匿化済み（出発地は行政区域の代表地点）。本サイトは個人特定につながる二次加工を行いません。</p>
           <p class="fineprint" id="gen-info"></p>
         </section>
 
@@ -106,6 +107,7 @@
 </div>
 
 <script src="./vendor/maplibre/maplibre-gl.js"></script>
+<script src="./js/i18n.js"></script>
 <script src="./js/app.js"></script>
 </body>
 </html>

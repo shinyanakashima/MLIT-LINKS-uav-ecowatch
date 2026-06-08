@@ -35,7 +35,7 @@ const state = {
 
 let map;
 
-const fmt = (n) => Number(n).toLocaleString('ja-JP');
+const fmt = (n) => Number(n).toLocaleString(i18nLang() === 'en' ? 'en-US' : 'ja-JP');
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // ---- base style ----
@@ -175,13 +175,13 @@ function updateLegend() {
   const el = document.getElementById('legend-body');
   if (state.view === 'heat') {
     el.innerHTML = `<div class="row"><span class="grad"></span></div>
-      <div class="row" style="justify-content:space-between"><span>低</span><span>飛行計画 密度</span><span>高</span></div>`;
+      <div class="row" style="justify-content:space-between"><span>${t('legend_low')}</span><span>${t('legend_density')}</span><span>${t('legend_high')}</span></div>`;
   } else {
     el.innerHTML = `
-      <div class="row"><span class="bubble" style="width:10px;height:10px;background:#2c7fb8;border-color:#2c7fb8"></span>少（〜数件）</div>
-      <div class="row"><span class="bubble" style="width:18px;height:18px;background:#a1dab4;border-color:#a1dab4"></span>中</div>
-      <div class="row"><span class="bubble" style="width:28px;height:28px;background:#fc8d59;border-color:#fc8d59"></span>多</div>
-      <div class="row" style="color:#9fb1c1">円の大きさ・色＝出発地の飛行計画件数</div>`;
+      <div class="row"><span class="bubble" style="width:10px;height:10px;background:#2c7fb8;border-color:#2c7fb8"></span>${t('legend_few')}</div>
+      <div class="row"><span class="bubble" style="width:18px;height:18px;background:#a1dab4;border-color:#a1dab4"></span>${t('legend_mid')}</div>
+      <div class="row"><span class="bubble" style="width:28px;height:28px;background:#fc8d59;border-color:#fc8d59"></span>${t('legend_many')}</div>
+      <div class="row" style="color:#9fb1c1">${t('legend_note')}</div>`;
   }
 }
 
@@ -199,16 +199,19 @@ function switchBasemap() {
 function setupInteractions() {
   map.on('click', 'muni-circle', (e) => {
     const p = e.features[0].properties;
-    const period = `${state.monthStart.replace('-', '年')}月〜${state.monthEnd.replace('-', '年')}月`;
-    const cats = [];
-    if (state.env) cats.push('環境調査');
-    if (state.nat) cats.push('自然観測');
+    const sep = i18nLang() === 'en' ? ' – ' : '〜';
+    const period = `${monthLabel(state.monthStart)}${sep}${monthLabel(state.monthEnd)}`;
+    const tags = [];
+    if (state.env) tags.push(`<span class="tag env">${t('env')}</span>`);
+    if (state.nat) tags.push(`<span class="tag nat">${t('nat')}</span>`);
+    if (!state.exclComp) tags.push(`<span class="tag">${t('pop_comp')}</span>`);
+    const count = t('pop_unit') ? `${fmt(+p.count)} ${t('pop_unit')}` : fmt(+p.count);
     new maplibregl.Popup({ closeButton: true, maxWidth: '280px' })
       .setLngLat(e.lngLat)
       .setHTML(`<div class="pop"><h3>${esc(p.dep)}</h3>
-        <div class="tags">${cats.map((c) => `<span class="tag ${c === '環境調査' ? 'env' : 'nat'}">${c}</span>`).join('')}${state.exclComp ? '' : '<span class="tag">包括含む</span>'}</div>
-        <dl><dt>飛行計画</dt><dd>${fmt(+p.count)} 件</dd><dt>対象期間</dt><dd>${esc(period)}</dd></dl>
-        <div class="disc">出発地の行政区域代表地点に集計（秘匿化済み）。申請・報告ベースであり実飛行・実態ではありません。データ品質は非保証。</div></div>`)
+        <div class="tags">${tags.join('')}</div>
+        <dl><dt>${t('pop_count')}</dt><dd>${count}</dd><dt>${t('pop_period')}</dt><dd>${esc(period)}</dd></dl>
+        <div class="disc">${t('pop_disc')}</div></div>`)
       .addTo(map);
   });
   map.on('mouseenter', 'muni-circle', () => { map.getCanvas().style.cursor = 'pointer'; });
@@ -219,10 +222,9 @@ function setupInteractions() {
 function fillMonthSelects() {
   const ss = document.getElementById('f-month-start');
   const es = document.getElementById('f-month-end');
-  const label = (m) => m.replace('-', '年') + '月';
   for (const m of state.months) {
-    ss.add(new Option(label(m), m));
-    es.add(new Option(label(m), m));
+    ss.add(new Option(monthLabel(m), m));
+    es.add(new Option(monthLabel(m), m));
   }
   state.monthStart = state.months[0];
   state.monthEnd = state.months[state.months.length - 1];
@@ -230,6 +232,47 @@ function fillMonthSelects() {
   es.value = state.monthEnd;
   ss.onchange = () => { state.monthStart = ss.value; refilter(); };
   es.onchange = () => { state.monthEnd = es.value; refilter(); };
+}
+
+// 言語切替時に月セレクトのラベルを振り直す（選択値は維持）
+function relabelMonths() {
+  for (const id of ['f-month-start', 'f-month-end']) {
+    const sel = document.getElementById(id);
+    if (!sel) continue;
+    for (const opt of sel.options) opt.textContent = monthLabel(opt.value);
+  }
+}
+
+function renderGenInfo(s) {
+  const el = document.getElementById('gen-info');
+  if (!el || !s) return;
+  const first = monthLabel(s.months[0]);
+  const last = monthLabel(s.months[s.months.length - 1]);
+  if (i18nLang() === 'en') {
+    el.textContent =
+      `Generated: ${s.generated} / Coverage: ${first} – ${last} (monthly) / ` +
+      `Of ${fmt(s.scanned_total)} scanned records, ${fmt(s.total)} environmental-purpose ` +
+      `(environmental survey / nature observation) records were extracted ` +
+      `(${fmt(s.genuine_total)} regular / ${fmt(s.comprehensive_total)} blanket applications).`;
+  } else {
+    el.textContent =
+      `生成日時：${s.generated}／対象：${first}〜${last}（月次）／走査 ${fmt(s.scanned_total)} 件中、` +
+      `環境用途（環境調査・自然観測）${fmt(s.total)} 件を抽出` +
+      `（通常 ${fmt(s.genuine_total)} 件／包括申請 ${fmt(s.comprehensive_total)} 件）。`;
+  }
+}
+
+// 言語切替: 静的UI＋動的テキストをまとめて再描画
+function applyAllI18n() {
+  applyStaticI18n();
+  relabelMonths();
+  renderGenInfo(state.summary);
+  updateLegend();
+  refilter(); // m-total/m-shown 等の数値ロケールを更新
+  document.getElementById('m-total').textContent = fmt(state.summary.genuine_total ?? state.summary.total);
+  document.getElementById('m-months').textContent = fmt(state.summary.months.length);
+  const lt = document.getElementById('lang-toggle');
+  if (lt) lt.textContent = t('lang_other');
 }
 
 function wireControls() {
@@ -246,6 +289,8 @@ function wireControls() {
   const shz = document.getElementById('l-shizen');
   if (shz) shz.onchange = (e) => { setVis('shizen-fill', e.target.checked); setVis('shizen-line', e.target.checked); };
   document.getElementById('panel-toggle').onclick = () => document.getElementById('panel').classList.toggle('open');
+  const lt = document.getElementById('lang-toggle');
+  if (lt) lt.onclick = () => { i18nSetLang(i18nLang() === 'en' ? 'ja' : 'en'); applyAllI18n(); };
 }
 
 async function init() {
@@ -255,6 +300,11 @@ async function init() {
     state.shizen = await fetch('./data/shizen_koen.geojson').then((r) => { if (!r.ok) throw 0; return r.json(); });
   } catch (e) { state.shizen = null; }
   state.months = summary.months;
+  state.summary = summary;
+
+  applyStaticI18n();
+  const lt = document.getElementById('lang-toggle');
+  if (lt) lt.textContent = t('lang_other');
 
   const shizenChk = document.getElementById('l-shizen');
   if (!state.shizen && shizenChk) { shizenChk.checked = false; shizenChk.disabled = true; const l = shizenChk.closest('label'); if (l) l.style.opacity = 0.45; }
@@ -267,8 +317,7 @@ async function init() {
 
   document.getElementById('m-total').textContent = fmt(summary.genuine_total ?? summary.total);
   document.getElementById('m-months').textContent = fmt(summary.months.length);
-  document.getElementById('gen-info').textContent =
-    `生成日時：${summary.generated}／対象：${summary.months[0]}〜${summary.months[summary.months.length - 1]}（月次）／走査 ${fmt(summary.scanned_total)} 件中、環境用途（環境調査・自然観測）${fmt(summary.total)} 件を抽出（通常 ${fmt(summary.genuine_total)} 件／包括申請 ${fmt(summary.comprehensive_total)} 件）。`;
+  renderGenInfo(summary);
 
   fillMonthSelects();
   wireControls();
@@ -299,10 +348,10 @@ async function init() {
 window.addEventListener('DOMContentLoaded', () => {
   const ld = document.createElement('div');
   ld.id = 'loading';
-  ld.innerHTML = '<span class="spinner"></span>データを読み込み中…';
+  ld.innerHTML = `<span class="spinner"></span>${t('loading')}`;
   document.getElementById('map').appendChild(ld);
   init().catch((err) => {
-    ld.innerHTML = 'データの読み込みに失敗しました：' + esc(err.message || err);
+    ld.innerHTML = t('load_error') + esc(err.message || err);
     console.error(err);
   });
 });
